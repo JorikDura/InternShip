@@ -1,3 +1,12 @@
 <resources>
-    <string name="app_name">InternShip</string>
+    <string name="app_name" translatable="false">InternShip</string>
+    <string name="my_home">My home</string>
+    <string name="cams">Cams</string>
+    <string name="doors">Doors</string>
+    <string name="tab_error">How did you do this?（*＾-＾*）</string>
+    <string name="image_error">Error</string>
+    <string name="current_title">Current title:</string>
+    <string name="new_title">New title:</string>
+    <string name="cancel">Cancel</string>
+    <string name="accept">Accept</string>
 </resources>
