@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.internship.domain.model.Camera
 import com.internship.domain.use_case.GetCamsUseCase
+import com.internship.domain.use_case.GetRoomsUseCase
 import com.internship.domain.use_case.SetFavouriteCamUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -14,6 +15,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CamsScreenViewModel @Inject constructor(
     private val getCamsUseCase: GetCamsUseCase,
+    private val getRoomsUseCase: GetRoomsUseCase,
     private val setFavouriteCamUseCase: SetFavouriteCamUseCase
 ) : ViewModel() {
 
@@ -22,6 +24,8 @@ class CamsScreenViewModel @Inject constructor(
 
     private val _cams = MutableLiveData(listOf<Camera>())
     val cams: LiveData<List<Camera>> get() = _cams
+    private val _rooms = MutableLiveData(listOf<String>())
+    val rooms: LiveData<List<String>> get() = _rooms
 
     init {
         loadData()
@@ -57,6 +61,8 @@ class CamsScreenViewModel @Inject constructor(
         viewModelScope.launch {
             val data = getCamsUseCase(fetchFromRemote)
             _cams.value = data
+            val rooms = getRoomsUseCase()
+            _rooms.value = rooms
         }
     }
 

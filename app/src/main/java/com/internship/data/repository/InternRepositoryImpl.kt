@@ -65,6 +65,10 @@ class InternRepositoryImpl @Inject constructor(
         return doorsFromDb.map { it.toDoor() }
     }
 
+    override suspend fun getRooms(): List<String> {
+        return apiService.getCams()?.data?.room ?: emptyList()
+    }
+
     override suspend fun setFavouriteCam(camId: Int, favourite: Boolean) {
         val cam = realm.query<CameraDao>("id == $0", camId).find().first()
         realm.write {

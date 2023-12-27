@@ -9,4 +9,5 @@
     <string name="new_title">Новое название:</string>
     <string name="cancel">Отмена</string>
     <string name="accept">Принять</string>
+    <string name="unknown">Неизвестная комната</string>
 </resources>
