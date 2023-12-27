@@ -256,8 +256,9 @@ fun DoorItem(
                             Text(text = stringResource(id = R.string.cancel), color = Color.Red)
                         }
                         TextButton(onClick = {
-                            eventListener(DoorScreenEvents.Edit(text))
+                            eventListener(DoorScreenEvents.Edit(door.id, text))
                             text = ""
+                            openDialog = false
                         }) {
                             Text(text = stringResource(id = R.string.accept))
                         }

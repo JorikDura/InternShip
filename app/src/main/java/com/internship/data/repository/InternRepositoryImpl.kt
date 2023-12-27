@@ -73,4 +73,31 @@ class InternRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override suspend fun setFavouriteDoor(doorId: Int, favourite: Boolean) {
+        val existingDoor = realm.query<DoorDao>("id == $0", doorId).find().first()
+        realm.write {
+            findLatest(existingDoor)?.let { door ->
+                door.isFavourite = favourite
+            }
+        }
+    }
+
+    override suspend fun setLockToDoor(doorId: Int, lock: Boolean) {
+        val existingDoor = realm.query<DoorDao>("id == $0", doorId).find().first()
+        realm.write {
+            findLatest(existingDoor)?.let { door ->
+                door.isOpened = lock
+            }
+        }
+    }
+
+    override suspend fun editDoorName(doorId: Int, newName: String) {
+        val existingDoor = realm.query<DoorDao>("id == $0", doorId).find().first()
+        realm.write {
+            findLatest(existingDoor)?.let { door ->
+                door.name = newName
+            }
+        }
+    }
 }

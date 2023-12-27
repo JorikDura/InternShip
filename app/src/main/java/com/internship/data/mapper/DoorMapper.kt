@@ -9,6 +9,7 @@ fun DoorDao.toDoor(): Door {
         name = this.name,
         image = this.image,
         room = this.room,
-        isFavourite = this.isFavourite
+        isFavourite = this.isFavourite,
+        isOpened = this.isOpened
     )
 }
