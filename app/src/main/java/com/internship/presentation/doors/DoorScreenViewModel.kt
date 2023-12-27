@@ -49,15 +49,15 @@ class DoorScreenViewModel @Inject constructor(
 
             DoorScreenEvents.Update -> {
                 _isRefreshing.value = true
-                loadData()
+                loadData(fetchFromRemote = true)
                 _isRefreshing.value = false
             }
         }
     }
 
-    private fun loadData() {
+    private fun loadData(fetchFromRemote: Boolean = false) {
         viewModelScope.launch {
-            val data = getDoorsUseCase()
+            val data = getDoorsUseCase(fetchFromRemote)
             _doors.value = data
         }
     }

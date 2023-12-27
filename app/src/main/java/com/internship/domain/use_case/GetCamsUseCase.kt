@@ -8,8 +8,8 @@ class GetCamsUseCase @Inject constructor(
     private val repository: InternRepository
 ) {
 
-    suspend operator fun invoke(): List<Camera> {
-        return repository.getCams()
+    suspend operator fun invoke(fetchFromRemote: Boolean = false): List<Camera> {
+        return repository.getCams(fetchFromRemote)
     }
 
 }

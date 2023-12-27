@@ -1,15 +1,15 @@
 package com.internship.data.mapper
 
-import com.internship.data.remote.dto.CameraDto
+import com.internship.data.local.dao.CameraDao
 import com.internship.domain.model.Camera
 
-fun CameraDto.toCamera(): Camera {
+fun CameraDao.toCamera(): Camera {
     return Camera(
         id = this.id,
         name = this.name,
-        image = this.snapshot,
+        image = this.image,
         room = this.room,
-        isFavourite = this.favorites,
-        isRec = this.rec,
+        isFavourite = this.isFavourite,
+        isRec = this.isRec,
     )
 }

@@ -56,17 +56,16 @@ class CamsScreenViewModel @Inject constructor(
             CamsScreenEvents.Update -> {
                 viewModelScope.launch {
                     _isRefreshing.value = true
-                    val test = getCamsUseCase()
-                    _cams.value = test
+                    loadData(fetchFromRemote = true)
                     _isRefreshing.value = false
                 }
             }
         }
     }
-    private fun loadData() {
+    private fun loadData(fetchFromRemote: Boolean = false) {
         viewModelScope.launch {
-            val remoteData = getCamsUseCase()
-            _cams.value = remoteData
+            val data = getCamsUseCase(fetchFromRemote)
+            _cams.value = data
         }
     }
 

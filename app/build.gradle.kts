@@ -4,6 +4,7 @@ plugins {
     kotlin("kapt")
     id("dagger.hilt.android.plugin")
     kotlin("plugin.serialization")
+    id("io.realm.kotlin")
 }
 
 android {
@@ -93,5 +94,8 @@ dependencies {
     implementation("io.ktor:ktor-client-logging:2.3.7")
     //serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
+    //realm
+    implementation("io.realm.kotlin:library-base:1.11.0")
+    implementation("io.realm.kotlin:library-sync:1.11.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
 }
-

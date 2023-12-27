@@ -1,14 +1,14 @@
 package com.internship.data.mapper
 
-import com.internship.data.remote.dto.DoorDto
+import com.internship.data.local.dao.DoorDao
 import com.internship.domain.model.Door
 
-fun DoorDto.toDoor(): Door {
+fun DoorDao.toDoor(): Door {
     return Door(
         id = this.id,
         name = this.name,
-        image = this.snapshot,
+        image = this.image,
         room = this.room,
-        isFavourite = this.favorites
+        isFavourite = this.isFavourite
     )
 }

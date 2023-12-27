@@ -8,8 +8,8 @@ class GetDoorsUseCase @Inject constructor(
     private val repository: InternRepository
 ) {
 
-    suspend operator fun invoke(): List<Door> {
-        return repository.getDoors()
+    suspend operator fun invoke(fetchFromRemote: Boolean = false): List<Door> {
+        return repository.getDoors(fetchFromRemote)
     }
 
 }
