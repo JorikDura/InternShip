@@ -6,13 +6,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.internship.domain.model.Camera
 import com.internship.domain.use_case.GetCamsUseCase
+import com.internship.domain.use_case.SetFavouriteCamUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class CamsScreenViewModel @Inject constructor(
-    private val getCamsUseCase: GetCamsUseCase
+    private val getCamsUseCase: GetCamsUseCase,
+    private val setFavouriteCamUseCase: SetFavouriteCamUseCase
 ) : ViewModel() {
 
     private val _isRefreshing = MutableLiveData(false)
@@ -28,28 +30,16 @@ class CamsScreenViewModel @Inject constructor(
     fun onEvent(event: CamsScreenEvents) {
         when (event) {
             is CamsScreenEvents.Favourite -> {
-                val newList = _cams.value?.toMutableList()
-                newList?.let {
-                    val item = newList.find {
-                        it.id == event.id
-                    }
-
-                    val index = newList.indexOf(item)
-                    newList[index].isFavourite = true
-                    _cams.value = newList
+                viewModelScope.launch {
+                    setFavouriteCamUseCase(event.id, true)
+                    loadData()
                 }
             }
 
             is CamsScreenEvents.UnFavourite -> {
-                val newList = _cams.value?.toMutableList()
-                newList?.let {
-                    val item = newList.find {
-                        it.id == event.id
-                    }
-
-                    val index = newList.indexOf(item)
-                    newList[index].isFavourite = false
-                    _cams.value = newList
+                viewModelScope.launch {
+                    setFavouriteCamUseCase(event.id, false)
+                    loadData()
                 }
             }
 
@@ -62,6 +52,7 @@ class CamsScreenViewModel @Inject constructor(
             }
         }
     }
+
     private fun loadData(fetchFromRemote: Boolean = false) {
         viewModelScope.launch {
             val data = getCamsUseCase(fetchFromRemote)

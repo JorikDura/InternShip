@@ -7,5 +7,6 @@ interface InternRepository {
 
     suspend fun getCams(fetchFromRemote: Boolean): List<Camera>
     suspend fun getDoors(fetchFromRemote: Boolean): List<Door>
+    suspend fun setFavouriteCam(camId: Int, favourite: Boolean)
 
 }
