@@ -5,6 +5,6 @@ data class Camera(
     val name: String,
     val image: String?,
     val room: String?,
-    val isFavourite: Boolean,
+    var isFavourite: Boolean,
     val isRec: Boolean
 )

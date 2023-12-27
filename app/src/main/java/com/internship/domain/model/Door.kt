@@ -6,5 +6,5 @@ data class Door(
     val image: String?,
     val room: String?,
     val isFavourite: Boolean,
-    val isOpened: Boolean,
+    val isOpened: Boolean = false,
 )

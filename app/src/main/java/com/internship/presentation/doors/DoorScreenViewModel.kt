@@ -5,14 +5,15 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.internship.domain.model.Door
+import com.internship.domain.use_case.GetDoorsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.random.Random
 
 @HiltViewModel
-class DoorScreenViewModel @Inject constructor() : ViewModel() {
+class DoorScreenViewModel @Inject constructor(
+    private val getDoorsUseCase: GetDoorsUseCase
+) : ViewModel() {
 
     private val _isRefreshing = MutableLiveData(false)
     val isRefreshing: LiveData<Boolean> get() = _isRefreshing
@@ -21,31 +22,7 @@ class DoorScreenViewModel @Inject constructor() : ViewModel() {
     val doors: LiveData<List<Door>> get() = _doors
 
     init {
-        val testValues = mutableListOf<Door>().apply {
-            repeat(5) {
-                add(
-                    Door(
-                        id = it,
-                        name = "Door $it",
-                        image = null,
-                        room = "Room $it",
-                        isFavourite = Random.nextBoolean(),
-                        isOpened = Random.nextBoolean()
-                    )
-                )
-            }
-            add(
-                Door(
-                    id = 5,
-                    name = "Door 5",
-                    image = "",
-                    room = "Room 5",
-                    isFavourite = Random.nextBoolean(),
-                    isOpened = Random.nextBoolean()
-                )
-            )
-        }
-        _doors.value = testValues
+        loadData()
     }
 
     fun onEvent(event: DoorScreenEvents) {
@@ -71,12 +48,17 @@ class DoorScreenViewModel @Inject constructor() : ViewModel() {
             }
 
             DoorScreenEvents.Update -> {
-                viewModelScope.launch {
-                    _isRefreshing.value = true
-                    delay(5000L)
-                    _isRefreshing.value = false
-                }
+                _isRefreshing.value = true
+                loadData()
+                _isRefreshing.value = false
             }
+        }
+    }
+
+    private fun loadData() {
+        viewModelScope.launch {
+            val data = getDoorsUseCase()
+            _doors.value = data
         }
     }
 }

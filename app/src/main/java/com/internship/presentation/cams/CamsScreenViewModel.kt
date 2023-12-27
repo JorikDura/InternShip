@@ -3,13 +3,17 @@ package com.internship.presentation.cams
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.internship.domain.model.Camera
+import com.internship.domain.use_case.GetCamsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.random.Random
 
 @HiltViewModel
-class CamsScreenViewModel @Inject constructor() : ViewModel() {
+class CamsScreenViewModel @Inject constructor(
+    private val getCamsUseCase: GetCamsUseCase
+) : ViewModel() {
 
     private val _isRefreshing = MutableLiveData(false)
     val isRefreshing: LiveData<Boolean> get() = _isRefreshing
@@ -17,60 +21,53 @@ class CamsScreenViewModel @Inject constructor() : ViewModel() {
     private val _cams = MutableLiveData(listOf<Camera>())
     val cams: LiveData<List<Camera>> get() = _cams
 
-    private val _camsList = sortedSetOf<Camera>({ o1, o2 -> o1.id.compareTo(o2.id) })
-
     init {
-        _camsList.apply {
-            repeat(6) {
-                add(
-                    Camera(
-                        id = it,
-                        name = "Camera $it",
-                        image = "",
-                        room = "Room 1",
-                        isFavourite = Random.nextBoolean(),
-                        isRec = Random.nextBoolean()
-                    )
-                )
-            }
-        }
-        updateList()
+        loadData()
     }
 
     fun onEvent(event: CamsScreenEvents) {
         when (event) {
             is CamsScreenEvents.Favourite -> {
-                val oldItem = _camsList.find {
-                    it.id == event.id
+                val newList = _cams.value?.toMutableList()
+                newList?.let {
+                    val item = newList.find {
+                        it.id == event.id
+                    }
+
+                    val index = newList.indexOf(item)
+                    newList[index].isFavourite = true
+                    _cams.value = newList
                 }
-                val newItem = oldItem?.copy(isFavourite = true)
-                newItem?.let {
-                    _camsList.remove(oldItem)
-                    _camsList.add(newItem)
-                }
-                updateList()
             }
 
             is CamsScreenEvents.UnFavourite -> {
-                val oldItem = _camsList.find {
-                    it.id == event.id
+                val newList = _cams.value?.toMutableList()
+                newList?.let {
+                    val item = newList.find {
+                        it.id == event.id
+                    }
+
+                    val index = newList.indexOf(item)
+                    newList[index].isFavourite = false
+                    _cams.value = newList
                 }
-                val newItem = oldItem?.copy(isFavourite = false)
-                newItem?.let {
-                    _camsList.remove(oldItem)
-                    _camsList.add(newItem)
-                }
-                updateList()
             }
 
             CamsScreenEvents.Update -> {
-
+                viewModelScope.launch {
+                    _isRefreshing.value = true
+                    val test = getCamsUseCase()
+                    _cams.value = test
+                    _isRefreshing.value = false
+                }
             }
         }
     }
-
-    private fun updateList() {
-        _cams.value = _camsList.toList()
+    private fun loadData() {
+        viewModelScope.launch {
+            val remoteData = getCamsUseCase()
+            _cams.value = remoteData
+        }
     }
 
 }
