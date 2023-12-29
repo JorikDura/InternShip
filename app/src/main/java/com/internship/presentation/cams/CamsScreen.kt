@@ -1,6 +1,7 @@
 package com.internship.presentation.cams
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,6 +10,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,18 +27,27 @@ import com.internship.R
 @Composable
 fun CamsScreen() {
     val viewModel: CamsScreenViewModel = hiltViewModel()
-    val cams = viewModel.cams.observeAsState(listOf())
-    val rooms = viewModel.rooms.observeAsState(listOf())
-    val isRefreshing = viewModel.isRefreshing.observeAsState(false)
+    val state = viewModel.state.observeAsState(CamsScreenState())
     val pullRefreshState = rememberPullRefreshState(
-        isRefreshing.value, { viewModel.onEvent(CamsScreenEvents.Update) })
+        state.value.isRefreshing, { viewModel.onEvent(CamsScreenEvents.Update) })
     Box(
         modifier = Modifier
             .pullRefresh(pullRefreshState)
     ) {
+
+        if (state.value.isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+
         LazyColumn {
-            rooms.value.forEach { room ->
-                val roomCams = cams.value.filter {
+            state.value.rooms.forEach { room ->
+                val roomCams = state.value.cams.filter {
                     it.room == room
                 }
 
@@ -62,7 +73,7 @@ fun CamsScreen() {
                 }
 
             }
-            val unknownPlaceRooms = cams.value.filter {
+            val unknownPlaceRooms = state.value.cams.filter {
                 it.room == null
             }
 
@@ -87,7 +98,7 @@ fun CamsScreen() {
             }
         }
         PullRefreshIndicator(
-            refreshing = isRefreshing.value,
+            refreshing = state.value.isRefreshing,
             state = pullRefreshState,
             modifier = Modifier.align(Alignment.TopCenter),
             contentColor = MaterialTheme.colorScheme.primary,

@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.internship.domain.model.Camera
 import com.internship.domain.use_case.GetCamsUseCase
 import com.internship.domain.use_case.GetRoomsUseCase
 import com.internship.domain.use_case.SetFavouriteCamUseCase
@@ -19,13 +18,8 @@ class CamsScreenViewModel @Inject constructor(
     private val setFavouriteCamUseCase: SetFavouriteCamUseCase
 ) : ViewModel() {
 
-    private val _isRefreshing = MutableLiveData(false)
-    val isRefreshing: LiveData<Boolean> get() = _isRefreshing
-
-    private val _cams = MutableLiveData(listOf<Camera>())
-    val cams: LiveData<List<Camera>> get() = _cams
-    private val _rooms = MutableLiveData(listOf<String>())
-    val rooms: LiveData<List<String>> get() = _rooms
+    private val _state = MutableLiveData(CamsScreenState(isLoading = true))
+    val state: LiveData<CamsScreenState> get() = _state
 
     init {
         loadData()
@@ -49,9 +43,9 @@ class CamsScreenViewModel @Inject constructor(
 
             CamsScreenEvents.Update -> {
                 viewModelScope.launch {
-                    _isRefreshing.value = true
+                    _state.value = _state.value?.copy(isRefreshing = true)
                     loadData(fetchFromRemote = true)
-                    _isRefreshing.value = false
+                    _state.value = _state.value?.copy(isRefreshing = false)
                 }
             }
         }
@@ -59,10 +53,11 @@ class CamsScreenViewModel @Inject constructor(
 
     private fun loadData(fetchFromRemote: Boolean = false) {
         viewModelScope.launch {
-            val data = getCamsUseCase(fetchFromRemote)
-            _cams.value = data
-            val rooms = getRoomsUseCase(fetchFromRemote)
-            _rooms.value = rooms
+            _state.value = _state.value?.copy(
+                isLoading = false,
+                cams = getCamsUseCase(fetchFromRemote),
+                rooms = getRoomsUseCase(fetchFromRemote)
+            )
         }
     }
 
