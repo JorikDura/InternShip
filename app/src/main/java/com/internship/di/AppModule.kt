@@ -2,6 +2,7 @@ package com.internship.di
 
 import com.internship.data.local.dao.CameraDao
 import com.internship.data.local.dao.DoorDao
+import com.internship.data.local.dao.RoomDao
 import com.internship.data.remote.ApiService
 import com.internship.data.remote.ApiServiceImpl
 import dagger.Module
@@ -40,7 +41,13 @@ object AppModule {
     @Provides
     @Singleton
     fun provideRealmDataBase(): Realm {
-        val config = RealmConfiguration.create(schema = setOf(CameraDao::class, DoorDao::class))
+        val config = RealmConfiguration.create(
+            schema = setOf(
+                CameraDao::class,
+                DoorDao::class,
+                RoomDao::class
+            )
+        )
         return Realm.open(config)
     }
 

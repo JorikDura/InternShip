@@ -61,7 +61,7 @@ class CamsScreenViewModel @Inject constructor(
         viewModelScope.launch {
             val data = getCamsUseCase(fetchFromRemote)
             _cams.value = data
-            val rooms = getRoomsUseCase()
+            val rooms = getRoomsUseCase(fetchFromRemote)
             _rooms.value = rooms
         }
     }

@@ -2,8 +2,10 @@ package com.internship.data.repository
 
 import com.internship.data.local.dao.CameraDao
 import com.internship.data.local.dao.DoorDao
+import com.internship.data.local.dao.RoomDao
 import com.internship.data.mapper.toCamera
 import com.internship.data.mapper.toDoor
+import com.internship.data.mapper.toRoomTitle
 import com.internship.data.remote.ApiService
 import com.internship.domain.model.Camera
 import com.internship.domain.model.Door
@@ -65,8 +67,23 @@ class InternRepositoryImpl @Inject constructor(
         return doorsFromDb.map { it.toDoor() }
     }
 
-    override suspend fun getRooms(): List<String> {
-        return apiService.getCams()?.data?.room ?: emptyList()
+    override suspend fun getRooms(fetchFromRemote: Boolean): List<String> {
+        var roomsFromDb = realm.query<RoomDao>().find()
+        if (roomsFromDb.isEmpty() || fetchFromRemote) {
+            val remoteRooms = apiService.getCams()?.data?.room
+            if (!remoteRooms.isNullOrEmpty()) {
+                realm.write {
+                    remoteRooms.forEach { room ->
+                        val newRoom = RoomDao().apply {
+                            title = room
+                        }
+                        copyToRealm(instance = newRoom, updatePolicy = UpdatePolicy.ALL)
+                    }
+                }
+                roomsFromDb = realm.query<RoomDao>().find()
+            }
+        }
+        return roomsFromDb.map { it.toRoomTitle() }
     }
 
     override suspend fun setFavouriteCam(camId: Int, favourite: Boolean) {
