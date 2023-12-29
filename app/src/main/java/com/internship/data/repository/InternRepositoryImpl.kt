@@ -73,8 +73,9 @@ class InternRepositoryImpl @Inject constructor(
             val remoteRooms = apiService.getCams()?.data?.room
             if (!remoteRooms.isNullOrEmpty()) {
                 realm.write {
-                    remoteRooms.forEach { room ->
+                    remoteRooms.forEachIndexed { index, room ->
                         val newRoom = RoomDao().apply {
+                            id = index
                             title = room
                         }
                         copyToRealm(instance = newRoom, updatePolicy = UpdatePolicy.ALL)
