@@ -45,7 +45,6 @@ class CamsScreenViewModel @Inject constructor(
                 viewModelScope.launch {
                     _state.value = _state.value?.copy(isRefreshing = true)
                     loadData(fetchFromRemote = true)
-                    _state.value = _state.value?.copy(isRefreshing = false)
                 }
             }
         }
@@ -55,6 +54,7 @@ class CamsScreenViewModel @Inject constructor(
         viewModelScope.launch {
             _state.value = _state.value?.copy(
                 isLoading = false,
+                isRefreshing = false,
                 cams = getCamsUseCase(fetchFromRemote),
                 rooms = getRoomsUseCase(fetchFromRemote)
             )
