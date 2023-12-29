@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.internship.domain.model.Door
 import com.internship.domain.use_case.EditDoorNameUseCase
 import com.internship.domain.use_case.GetDoorsUseCase
 import com.internship.domain.use_case.SetFavouriteDoorUseCase
@@ -21,11 +20,8 @@ class DoorScreenViewModel @Inject constructor(
     private val editDoorNameUseCase: EditDoorNameUseCase
 ) : ViewModel() {
 
-    private val _isRefreshing = MutableLiveData(false)
-    val isRefreshing: LiveData<Boolean> get() = _isRefreshing
-
-    private val _doors = MutableLiveData<List<Door>>(listOf())
-    val doors: LiveData<List<Door>> get() = _doors
+    private val _state = MutableLiveData(DoorScreenState(isLoading = true))
+    val state: LiveData<DoorScreenState> get() = _state
 
     init {
         loadData()
@@ -69,17 +65,19 @@ class DoorScreenViewModel @Inject constructor(
             }
 
             DoorScreenEvents.Update -> {
-                _isRefreshing.value = true
+                _state.value = _state.value?.copy(isRefreshing = true)
                 loadData(fetchFromRemote = true)
-                _isRefreshing.value = false
             }
         }
     }
 
     private fun loadData(fetchFromRemote: Boolean = false) {
         viewModelScope.launch {
-            val data = getDoorsUseCase(fetchFromRemote)
-            _doors.value = data
+            _state.value = _state.value?.copy(
+                isLoading = false,
+                isRefreshing = false,
+                doors = getDoorsUseCase(fetchFromRemote)
+            )
         }
     }
 }

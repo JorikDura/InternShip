@@ -1,12 +1,14 @@
 package com.internship.presentation.doors
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
@@ -18,16 +20,26 @@ import androidx.hilt.navigation.compose.hiltViewModel
 @Composable
 fun DoorsScreen() {
     val viewModel: DoorScreenViewModel = hiltViewModel()
-    val doors = viewModel.doors.observeAsState(listOf())
-    val isRefreshing = viewModel.isRefreshing.observeAsState(false)
+    val state = viewModel.state.observeAsState(DoorScreenState())
     val pullRefreshState = rememberPullRefreshState(
-        isRefreshing.value, { viewModel.onEvent(DoorScreenEvents.Update) })
+        state.value.isRefreshing, { viewModel.onEvent(DoorScreenEvents.Update) })
     Box(
         modifier = Modifier
             .pullRefresh(pullRefreshState)
     ) {
+
+        if (state.value.isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+
         LazyColumn {
-            items(items = doors.value, key = { it.id }) { door ->
+            items(items = state.value.doors, key = { it.id }) { door ->
                 DoorItem(
                     door = door,
                     eventListener = { event ->
@@ -38,7 +50,7 @@ fun DoorsScreen() {
 
         }
         PullRefreshIndicator(
-            refreshing = isRefreshing.value,
+            refreshing = state.value.isRefreshing,
             state = pullRefreshState,
             modifier = Modifier.align(Alignment.TopCenter),
             contentColor = MaterialTheme.colorScheme.primary,
