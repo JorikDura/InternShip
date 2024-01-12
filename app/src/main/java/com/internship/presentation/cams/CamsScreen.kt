@@ -52,22 +52,45 @@ fun CamsScreen() {
 
         LazyColumn {
             state.value.rooms.forEach { room ->
-                val roomCams = state.value.cams.filter {
-                    it.room == room
-                }
+                val cams = state.value.cams[room]
+                cams?.let { cameras ->
+                    if (cameras.isNotEmpty()) {
+                        item {
+                            Text(
+                                modifier = Modifier
+                                    .padding(start = 16.dp, top = 8.dp, bottom = 8.dp)
+                                    .fillMaxWidth(),
+                                text = room,
+                                fontSize = 20.sp
+                            )
+                        }
 
-                if (roomCams.isNotEmpty()) {
+                        items(cameras, key = { it.id }) { camera ->
+                            CameraItem(
+                                camera = camera,
+                                eventListener = { event ->
+                                    viewModel.onEvent(event)
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+
+            val unknownPlaceRooms = state.value.cams[null]
+
+            unknownPlaceRooms?.let { cameras ->
+                if (cameras.isNotEmpty()) {
                     item {
                         Text(
                             modifier = Modifier
                                 .padding(start = 16.dp, top = 8.dp, bottom = 8.dp)
                                 .fillMaxWidth(),
-                            text = room,
+                            text = stringResource(id = R.string.unknown),
                             fontSize = 20.sp
                         )
                     }
-
-                    items(roomCams, key = { it.id }) { camera ->
+                    items(cameras, key = { it.id }) { camera ->
                         CameraItem(
                             camera = camera,
                             eventListener = { event ->
@@ -75,30 +98,6 @@ fun CamsScreen() {
                             }
                         )
                     }
-                }
-
-            }
-            val unknownPlaceRooms = state.value.cams.filter {
-                it.room == null
-            }
-
-            if (unknownPlaceRooms.isNotEmpty()) {
-                item {
-                    Text(
-                        modifier = Modifier
-                            .padding(start = 16.dp, top = 8.dp, bottom = 8.dp)
-                            .fillMaxWidth(),
-                        text = stringResource(id = R.string.unknown),
-                        fontSize = 20.sp
-                    )
-                }
-                items(unknownPlaceRooms, key = { it.id }) { camera ->
-                    CameraItem(
-                        camera = camera,
-                        eventListener = { event ->
-                            viewModel.onEvent(event)
-                        }
-                    )
                 }
             }
         }
@@ -110,7 +109,7 @@ fun CamsScreen() {
             backgroundColor = MaterialTheme.colorScheme.background
         )
 
-        AnimatedVisibility (
+        AnimatedVisibility(
             modifier = Modifier
                 .padding(8.dp)
                 .align(Alignment.BottomCenter),

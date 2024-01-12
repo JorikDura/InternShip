@@ -6,7 +6,7 @@ data class CamsScreenState(
     val isLoading: Boolean = false,
     val isRefreshing: Boolean = false,
     val isError: Boolean = false,
-    val cams: List<Camera> = listOf(),
     val rooms: List<String> = listOf(),
+    val cams: MutableMap<String?, List<Camera>> = mutableMapOf(),
     val errorMessage: String = ""
 )

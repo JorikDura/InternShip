@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.internship.domain.model.Camera
 import com.internship.domain.use_case.GetCamsUseCase
 import com.internship.domain.use_case.GetRoomsUseCase
 import com.internship.domain.use_case.SetFavouriteCamUseCase
@@ -66,17 +67,32 @@ class CamsScreenViewModel @Inject constructor(
 
                 is Resource.Success -> {
                     result.data?.let { cams ->
+                        val filteredCams = mutableMapOf<String?, List<Camera>>()
+                        val rooms = getRoomsUseCase(fetchFromRemote)
+
+                        rooms.forEach { room ->
+                            val roomCams = cams.filter {
+                                it.room == room
+                            }
+                            filteredCams[room] = roomCams
+                        }
+
+                        val unknownCams = cams.filter {
+                            it.room == null
+                        }
+
+                        filteredCams[null] = unknownCams
+
                         _state.value = _state.value?.copy(
                             isLoading = false,
                             isRefreshing = false,
                             isError = false,
-                            cams = cams,
-                            rooms = getRoomsUseCase(fetchFromRemote)
+                            rooms = rooms,
+                            cams = filteredCams
                         )
                     }
                 }
             }
         }
     }
-
 }
