@@ -25,7 +25,11 @@ android {
     }
 
     buildTypes {
+        debug {
+            buildConfigField("String", "BASE_URL", "\"https://cars.cprogroup.ru/api/rubetek\"")
+        }
         release {
+            buildConfigField("String", "BASE_URL", "\"https://cars.cprogroup.ru/api/rubetek\"")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -42,6 +46,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.3"
