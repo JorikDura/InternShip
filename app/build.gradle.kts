@@ -27,9 +27,13 @@ android {
     buildTypes {
         debug {
             buildConfigField("String", "BASE_URL", "\"https://cars.cprogroup.ru/api/rubetek\"")
+            buildConfigField("String", "API_CAMERAS", "\"/cameras/\"")
+            buildConfigField("String", "API_DOORS", "\"/doors/\"")
         }
         release {
             buildConfigField("String", "BASE_URL", "\"https://cars.cprogroup.ru/api/rubetek\"")
+            buildConfigField("String", "API_CAMERAS", "\"/cameras/\"")
+            buildConfigField("String", "API_DOORS", "\"/doors/\"")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
