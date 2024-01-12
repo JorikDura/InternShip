@@ -4,7 +4,9 @@ import com.internship.data.local.dao.CameraDao
 import com.internship.data.local.dao.DoorDao
 import com.internship.data.local.dao.RoomDao
 import com.internship.data.mapper.toCamera
+import com.internship.data.mapper.toCameraDao
 import com.internship.data.mapper.toDoor
+import com.internship.data.mapper.toDoorDao
 import com.internship.data.mapper.toRoomTitle
 import com.internship.data.remote.ApiService
 import com.internship.domain.model.Camera
@@ -27,21 +29,15 @@ class InternRepositoryImpl @Inject constructor(
             if (!remoteCamsData.isNullOrEmpty()) {
                 realm.write {
                     remoteCamsData.forEach { cam ->
-                        val camera = CameraDao().apply {
-                            id = cam.id
-                            name = cam.name
-                            image = cam.snapshot
-                            room = cam.room
-                            isFavourite = cam.favorites
-                            isRec = cam.rec
-                        }
+                        val camera = cam.toCameraDao()
                         copyToRealm(instance = camera, updatePolicy = UpdatePolicy.ALL)
                     }
                 }
                 camsFromDb = realm.query<CameraDao>().find()
             }
         }
-        return camsFromDb.map { it.toCamera() }
+        val result = camsFromDb.map { it.toCamera() }
+        return result
     }
 
     override suspend fun getDoors(fetchFromRemote: Boolean): List<Door> {
@@ -51,20 +47,15 @@ class InternRepositoryImpl @Inject constructor(
             if (!remoteDoorsData.isNullOrEmpty()) {
                 realm.write {
                     remoteDoorsData.forEach { door ->
-                        val newDoor = DoorDao().apply {
-                            id = door.id
-                            name = door.name
-                            image = door.snapshot
-                            room = door.room
-                            isFavourite = door.favorites
-                        }
+                        val newDoor = door.toDoorDao()
                         copyToRealm(instance = newDoor, updatePolicy = UpdatePolicy.ALL)
                     }
                 }
                 doorsFromDb = realm.query<DoorDao>().find()
             }
         }
-        return doorsFromDb.map { it.toDoor() }
+        val result = doorsFromDb.map { it.toDoor() }
+        return result
     }
 
     override suspend fun getRooms(fetchFromRemote: Boolean): List<String> {
@@ -84,7 +75,8 @@ class InternRepositoryImpl @Inject constructor(
                 roomsFromDb = realm.query<RoomDao>().find()
             }
         }
-        return roomsFromDb.map { it.toRoomTitle() }
+        val result = roomsFromDb.map { it.toRoomTitle() }
+        return result
     }
 
     override suspend fun setFavouriteCam(camId: Int, favourite: Boolean) {
