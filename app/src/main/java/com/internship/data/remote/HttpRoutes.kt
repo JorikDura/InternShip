@@ -1,8 +1,8 @@
 package com.internship.data.remote
 
-object HttpRoutes {
+import com.internship.BuildConfig
 
-    private const val BASE_URL = "https://cars.cprogroup.ru/api/rubetek"
-    const val CAMERAS = "${BASE_URL}/cameras/"
-    const val DOORS = "${BASE_URL}/doors/"
+object HttpRoutes {
+    const val CAMERAS = "${BuildConfig.BASE_URL}/cameras/"
+    const val DOORS = "${BuildConfig.BASE_URL}/doors/"
 }
