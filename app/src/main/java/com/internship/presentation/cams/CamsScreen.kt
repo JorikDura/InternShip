@@ -1,5 +1,8 @@
 package com.internship.presentation.cams
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,6 +15,7 @@ import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
@@ -30,6 +34,7 @@ fun CamsScreen() {
     val state = viewModel.state.observeAsState(CamsScreenState())
     val pullRefreshState = rememberPullRefreshState(
         state.value.isRefreshing, { viewModel.onEvent(CamsScreenEvents.Update) })
+
     Box(
         modifier = Modifier
             .pullRefresh(pullRefreshState)
@@ -104,6 +109,19 @@ fun CamsScreen() {
             contentColor = MaterialTheme.colorScheme.primary,
             backgroundColor = MaterialTheme.colorScheme.background
         )
+
+        AnimatedVisibility (
+            modifier = Modifier
+                .padding(8.dp)
+                .align(Alignment.BottomCenter),
+            visible = state.value.isError,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            Snackbar {
+                Text(text = state.value.errorMessage)
+            }
+        }
     }
 
 }

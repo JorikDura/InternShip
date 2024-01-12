@@ -12,6 +12,7 @@ import com.internship.data.remote.ApiService
 import com.internship.domain.model.Camera
 import com.internship.domain.model.Door
 import com.internship.domain.repository.InternRepository
+import com.internship.utils.Resource
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
@@ -22,59 +23,105 @@ class InternRepositoryImpl @Inject constructor(
     private val realm: Realm
 ) : InternRepository {
 
-    override suspend fun getCams(fetchFromRemote: Boolean): List<Camera> {
+    private var roomCache = mutableListOf<String>()
+
+    override suspend fun getCams(fetchFromRemote: Boolean): Resource<List<Camera>> {
         var camsFromDb = realm.query<CameraDao>().find()
         if (camsFromDb.isEmpty() || fetchFromRemote) {
-            val remoteCamsData = apiService.getCams()?.data?.camera
-            if (!remoteCamsData.isNullOrEmpty()) {
-                realm.write {
-                    remoteCamsData.forEach { cam ->
-                        val camera = cam.toCameraDao()
-                        copyToRealm(instance = camera, updatePolicy = UpdatePolicy.ALL)
+            val remoteData = apiService.getCams()
+            when (remoteData) {
+                is Resource.Error -> {
+                    return Resource.Error(message = remoteData.message ?: ERROR_MESSAGE)
+                }
+
+                is Resource.Success -> {
+                    remoteData.data?.data?.room?.let {
+                        roomCache.clear()
+                        roomCache.addAll(it)
+                    }
+                    val remoteCamsData = remoteData.data?.data?.camera
+                    if (!remoteCamsData.isNullOrEmpty()) {
+                        realm.write {
+                            remoteCamsData.forEach { cam ->
+                                val camera = cam.toCameraDao()
+                                copyToRealm(instance = camera, updatePolicy = UpdatePolicy.ALL)
+                            }
+                        }
+                        camsFromDb = realm.query<CameraDao>().find()
                     }
                 }
-                camsFromDb = realm.query<CameraDao>().find()
             }
         }
         val result = camsFromDb.map { it.toCamera() }
-        return result
+        return Resource.Success(data = result)
     }
 
-    override suspend fun getDoors(fetchFromRemote: Boolean): List<Door> {
+    override suspend fun getDoors(fetchFromRemote: Boolean): Resource<List<Door>> {
         var doorsFromDb = realm.query<DoorDao>().find()
         if (doorsFromDb.isEmpty() || fetchFromRemote) {
-            val remoteDoorsData = apiService.getDoors()?.data
-            if (!remoteDoorsData.isNullOrEmpty()) {
-                realm.write {
-                    remoteDoorsData.forEach { door ->
-                        val newDoor = door.toDoorDao()
-                        copyToRealm(instance = newDoor, updatePolicy = UpdatePolicy.ALL)
+            val remoteData = apiService.getDoors()
+            when (remoteData) {
+                is Resource.Error -> {
+                    return Resource.Error(message = remoteData.message ?: ERROR_MESSAGE)
+                }
+
+                is Resource.Success -> {
+                    val remoteDoorsData = remoteData.data?.data
+                    if (!remoteDoorsData.isNullOrEmpty()) {
+                        realm.write {
+                            remoteDoorsData.forEach { door ->
+                                val newDoor = door.toDoorDao()
+                                copyToRealm(instance = newDoor, updatePolicy = UpdatePolicy.ALL)
+                            }
+                        }
+                        doorsFromDb = realm.query<DoorDao>().find()
                     }
                 }
-                doorsFromDb = realm.query<DoorDao>().find()
             }
         }
         val result = doorsFromDb.map { it.toDoor() }
-        return result
+        return Resource.Success(data = result)
     }
 
     override suspend fun getRooms(fetchFromRemote: Boolean): List<String> {
         var roomsFromDb = realm.query<RoomDao>().find()
-        if (roomsFromDb.isEmpty() || fetchFromRemote) {
-            val remoteRooms = apiService.getCams()?.data?.room
-            if (!remoteRooms.isNullOrEmpty()) {
-                realm.write {
-                    remoteRooms.forEachIndexed { index, room ->
-                        val newRoom = RoomDao().apply {
-                            id = index
-                            title = room
+
+        if (roomsFromDb.isEmpty() && roomCache.isNotEmpty()) {
+            realm.write {
+                roomCache.forEachIndexed { index, room ->
+                    val newRoom = RoomDao().apply {
+                        id = index
+                        title = room
+                    }
+                    copyToRealm(instance = newRoom, updatePolicy = UpdatePolicy.ALL)
+                }
+            }
+            roomsFromDb = realm.query<RoomDao>().find()
+        }
+
+        if (roomsFromDb.isEmpty() || fetchFromRemote && roomCache.isEmpty()) {
+            val remoteData = apiService.getCams()
+            when (remoteData) {
+                is Resource.Error -> Unit
+
+                is Resource.Success -> {
+                    val remoteRooms = remoteData.data?.data?.room
+                    if (!remoteRooms.isNullOrEmpty()) {
+                        realm.write {
+                            remoteRooms.forEachIndexed { index, room ->
+                                val newRoom = RoomDao().apply {
+                                    id = index
+                                    title = room
+                                }
+                                copyToRealm(instance = newRoom, updatePolicy = UpdatePolicy.ALL)
+                            }
                         }
-                        copyToRealm(instance = newRoom, updatePolicy = UpdatePolicy.ALL)
+                        roomsFromDb = realm.query<RoomDao>().find()
                     }
                 }
-                roomsFromDb = realm.query<RoomDao>().find()
             }
         }
+
         val result = roomsFromDb.map { it.toRoomTitle() }
         return result
     }
@@ -113,5 +160,9 @@ class InternRepositoryImpl @Inject constructor(
                 door.name = newName
             }
         }
+    }
+
+    companion object {
+        private const val ERROR_MESSAGE = "Something bad happened"
     }
 }

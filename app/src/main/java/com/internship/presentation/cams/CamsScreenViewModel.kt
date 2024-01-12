@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.internship.domain.use_case.GetCamsUseCase
 import com.internship.domain.use_case.GetRoomsUseCase
 import com.internship.domain.use_case.SetFavouriteCamUseCase
+import com.internship.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -52,12 +53,29 @@ class CamsScreenViewModel @Inject constructor(
 
     private fun loadData(fetchFromRemote: Boolean = false) {
         viewModelScope.launch {
-            _state.value = _state.value?.copy(
-                isLoading = false,
-                isRefreshing = false,
-                cams = getCamsUseCase(fetchFromRemote),
-                rooms = getRoomsUseCase(fetchFromRemote)
-            )
+            val result = getCamsUseCase(fetchFromRemote)
+            when (result) {
+                is Resource.Error -> {
+                    _state.value = _state.value?.copy(
+                        isLoading = false,
+                        isRefreshing = false,
+                        isError = true,
+                        errorMessage = result.message ?: ""
+                    )
+                }
+
+                is Resource.Success -> {
+                    result.data?.let { cams ->
+                        _state.value = _state.value?.copy(
+                            isLoading = false,
+                            isRefreshing = false,
+                            isError = false,
+                            cams = cams,
+                            rooms = getRoomsUseCase(fetchFromRemote)
+                        )
+                    }
+                }
+            }
         }
     }
 
