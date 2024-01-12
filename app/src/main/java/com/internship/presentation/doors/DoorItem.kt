@@ -42,10 +42,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.internship.R
@@ -101,7 +102,7 @@ fun DoorItem(
                 }
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.edit),
+                    imageVector = ImageVector.vectorResource(id = R.drawable.edit),
                     contentDescription = null,
                     tint = colorResource(id = R.color.blue)
                 )
@@ -121,13 +122,13 @@ fun DoorItem(
                 AnimatedContent(targetState = door.isFavourite, label = "") { isFavourite ->
                     if (isFavourite) {
                         Icon(
-                            painter = painterResource(id = R.drawable.star),
+                            imageVector = ImageVector.vectorResource(id = R.drawable.star),
                             contentDescription = null,
                             tint = colorResource(id = R.color.brown)
                         )
                     } else {
                         Icon(
-                            painter = painterResource(id = R.drawable.star_outfilled),
+                            imageVector = ImageVector.vectorResource(id = R.drawable.star_outfilled),
                             contentDescription = null,
                             tint = colorResource(id = R.color.brown)
                         )
@@ -161,7 +162,7 @@ fun DoorItem(
                     Icon(
                         modifier = Modifier
                             .align(Alignment.Center),
-                        painter = painterResource(id = R.drawable.play),
+                        imageVector = ImageVector.vectorResource(id = R.drawable.play),
                         tint = Color.White,
                         contentDescription = null
                     )
@@ -194,13 +195,13 @@ fun DoorItem(
                     ) { isOpened ->
                         if (isOpened) {
                             Icon(
-                                painter = painterResource(id = R.drawable.lockoff),
+                                imageVector = ImageVector.vectorResource(id = R.drawable.lockoff),
                                 contentDescription = null,
                                 tint = colorResource(id = R.color.blue)
                             )
                         } else {
                             Icon(
-                                painter = painterResource(id = R.drawable.lockon),
+                                imageVector = ImageVector.vectorResource(id = R.drawable.lockon),
                                 contentDescription = null,
                                 tint = colorResource(id = R.color.blue)
                             )

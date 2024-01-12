@@ -31,9 +31,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.internship.R
@@ -92,13 +93,13 @@ fun CameraItem(
                 ) { favourite ->
                     if (favourite) {
                         Icon(
-                            painter = painterResource(id = R.drawable.star),
+                            imageVector = ImageVector.vectorResource(id = R.drawable.star),
                             contentDescription = null,
                             tint = colorResource(id = R.color.brown)
                         )
                     } else {
                         Icon(
-                            painter = painterResource(id = R.drawable.star_outfilled),
+                            imageVector = ImageVector.vectorResource(id = R.drawable.star_outfilled),
                             contentDescription = null,
                             tint = colorResource(id = R.color.brown)
                         )
@@ -132,7 +133,7 @@ fun CameraItem(
                 Icon(
                     modifier = Modifier
                         .align(Alignment.Center),
-                    painter = painterResource(id = R.drawable.play),
+                    imageVector = ImageVector.vectorResource(id = R.drawable.play),
                     tint = Color.White,
                     contentDescription = null
                 )
@@ -143,7 +144,7 @@ fun CameraItem(
                             .padding(top = 4.dp, start = 4.dp)
                             .size(24.dp)
                             .align(Alignment.TopStart),
-                        painter = painterResource(id = R.drawable.rec),
+                        imageVector = ImageVector.vectorResource(id = R.drawable.rec),
                         tint = Color.Red,
                         contentDescription = null
                     )
@@ -156,7 +157,7 @@ fun CameraItem(
                         .align(Alignment.TopEnd), visible = camera.isFavourite
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.star),
+                        imageVector = ImageVector.vectorResource(id = R.drawable.star),
                         tint = colorResource(id = R.color.brown),
                         contentDescription = null
                     )
