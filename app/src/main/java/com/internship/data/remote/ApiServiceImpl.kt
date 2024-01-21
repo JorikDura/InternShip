@@ -1,8 +1,9 @@
 package com.internship.data.remote
 
 import android.util.Log
-import com.internship.data.remote.dto.CamerasResponseDto
-import com.internship.data.remote.dto.DoorResponseDto
+import com.internship.data.remote.dto.CameraDataDto
+import com.internship.data.remote.dto.DoorDto
+import com.internship.data.remote.dto.ResponseDto
 import com.internship.utils.Resource
 import io.ktor.client.HttpClient
 import io.ktor.client.call.NoTransformationFoundException
@@ -18,16 +19,16 @@ import javax.inject.Inject
 class ApiServiceImpl @Inject constructor(
     private val client: HttpClient
 ) : ApiService {
-    override suspend fun getCams(): Resource<CamerasResponseDto> {
-        return makeRequest<CamerasResponseDto> {
+    override suspend fun getCams(): Resource<ResponseDto<CameraDataDto>>{
+        return makeRequest<ResponseDto<CameraDataDto>> {
             client.get {
                 url(HttpRoutes.CAMERAS)
             }
         }
     }
 
-    override suspend fun getDoors(): Resource<DoorResponseDto> {
-        return makeRequest<DoorResponseDto> {
+    override suspend fun getDoors(): Resource<ResponseDto<List<DoorDto>>> {
+        return makeRequest<ResponseDto<List<DoorDto>>> {
             client.get {
                 url(HttpRoutes.DOORS)
             }

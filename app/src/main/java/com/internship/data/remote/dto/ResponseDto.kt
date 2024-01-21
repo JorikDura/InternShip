@@ -5,9 +5,9 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class DoorResponseDto(
-    @SerialName("data")
-    val `data`: List<DoorDto>,
+data class ResponseDto<T>(
     @SerialName("success")
-    val success: Boolean
+    val success: Boolean,
+    @SerialName("data")
+    val data: T
 )
